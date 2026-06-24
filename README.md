@@ -41,8 +41,11 @@ pitch-deck-evaluator/
 
 ├── modules/
 │     ├── pdf_parser.py     # Extract text from PDF
+
 │     ├── evaluator.py      # LLM evaluation logic
+
 │     ├── prompts.py        # VC-calibrated prompt engineering
+
 │     └── report.py         # Score interpretation and report packaging
 
 │
