@@ -40,11 +40,9 @@ pitch-deck-evaluator/
 │
 
 ├── modules/
-
 │     ├── pdf_parser.py     # Extract text from PDF
-
 │     ├── evaluator.py      # LLM evaluation logic
-
+│     ├── prompts.py        # VC-calibrated prompt engineering
 │     └── report.py         # Score interpretation and report packaging
 
 │
@@ -54,7 +52,7 @@ pitch-deck-evaluator/
 ## Setup
 
 ```bash
-git clone https://github.com/yourusername/pitch-deck-evaluator
+git clone https://github.com/amanighribi/pitch-deck-evaluator
 cd pitch-deck-evaluator
 python -m venv venv
 venv\Scripts\activate
