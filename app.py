@@ -1,5 +1,5 @@
 import streamlit as st
-from modules.pdf_parser import extract_text_from_pdf
+from modules.pdf_parser import extract_text_from_pdf, extract_text_from_pptx
 from modules.evaluator import evaluate_deck
 from modules.report import generate_report
 
@@ -8,18 +8,45 @@ st.set_page_config(page_title="PitchLens AI", page_icon="⚡", layout="wide")
 st.title("⚡ PitchLens AI")
 st.caption("An AI-powered pitch deck evaluator built for investors.")
 
-uploaded_file = st.file_uploader("Upload your pitch deck (PDF)", type=["pdf"])
+# Input method selector
+input_method = st.radio(
+    "How would you like to provide your pitch deck?",
+    ["Upload PDF", "Upload PPTX", "Paste Text"],
+    horizontal=True
+)
 
-if uploaded_file:
-    with st.spinner("Reading your deck..."):
-        deck_text = extract_text_from_pdf(uploaded_file)
+deck_text = ""
 
-    if not deck_text:
-        st.error("Could not extract text from this PDF. Make sure it's not a scanned image.")
-        st.stop()
+if input_method == "Upload PDF":
+    uploaded_file = st.file_uploader("Upload your pitch deck (PDF)", type=["pdf"])
+    if uploaded_file:
+        with st.spinner("Reading your deck..."):
+            deck_text = extract_text_from_pdf(uploaded_file)
+        if not deck_text:
+            st.error("Could not extract text from this PDF. Make sure it's not a scanned image.")
+            st.stop()
+        st.success(f"Deck loaded. Extracted {len(deck_text.split())} words across slides.")
 
-    st.success(f"Deck loaded. Extracted {len(deck_text.split())} words across slides.")
+elif input_method == "Upload PPTX":
+    uploaded_file = st.file_uploader("Upload your pitch deck (PPTX)", type=["pptx"])
+    if uploaded_file:
+        with st.spinner("Reading your deck..."):
+            deck_text = extract_text_from_pptx(uploaded_file)
+        if not deck_text:
+            st.error("Could not extract text from this PPTX file.")
+            st.stop()
+        st.success(f"Deck loaded. Extracted {len(deck_text.split())} words across slides.")
 
+elif input_method == "Paste Text":
+    deck_text = st.text_area(
+        "Paste your pitch deck content here",
+        height=300,
+        placeholder="Paste slide content, bullet points, or any text describing your startup..."
+    )
+    if deck_text:
+        st.success(f"Text received. {len(deck_text.split())} words detected.")
+
+if deck_text:
     if st.button("⚡ Evaluate Deck"):
         with st.spinner("Analyzing through an investor lens..."):
             evaluation = evaluate_deck(deck_text)
@@ -40,11 +67,11 @@ if uploaded_file:
             st.markdown("**Investment Readiness**")
             readiness = report['investment_readiness']
             if "Strong" in readiness:
-                  icon = "🟢"
+                icon = "🟢"
             elif "Potential" in readiness:
-                  icon = "🟡"
+                icon = "🟡"
             else:
-                  icon = "🔴"
+                icon = "🔴"
             st.info(f"{icon} {readiness}\n\n{report['readiness_detail']}")
             st.markdown("**Investor Recommendation**")
             st.info(report["recommendation"])
